@@ -1,0 +1,21 @@
+* {
+    /* border: solid black 1px; */
+}
+
+.gameboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    width: 500px;
+    height: 500px;
+    gap: 5px;
+    background-color: black;
+}
+
+.box {
+    display: grid;
+    place-items: center;
+    font-size: 30px;
+    background-color: aqua;
+}
+
