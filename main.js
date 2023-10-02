@@ -1,15 +1,24 @@
+
 const gameboard = (() => {
 
+    
     const boardContainer = document.querySelector('.gameboard');
     const boardContainerChildNodes = boardContainer.childNodes;
+    const display = document.querySelector('.display')
+
     let gameArray = ['','','','','','','','','']; //initializes gameArray, each element being one of the 9 tic tac toe elements
-    let value = [''] //making array to save which tile the user clicks on 
+    let value = [''] //making array to save which tile the user clicks on
+
+    function displayUpdater (text) {
+        display.innerHTML = text
+    }
+
 
     function makeBoard () {
-
         for (let i=0; i< gameArray.length; i++) {
             let box = document.createElement('div');
             box.classList.add('box');
+            box.classList.add('newBox');
             box.innerHTML = gameArray[i];
             data = box.dataset;
             data.indexnumber = i;
@@ -34,7 +43,8 @@ const gameboard = (() => {
     }
         
     function clearBoard () {
-        while(boardContainer.firstChild){
+ 
+           while(boardContainer.firstChild){
         boardContainer.removeChild(boardContainer.firstChild);}
         }
 
@@ -45,26 +55,27 @@ const gameboard = (() => {
         value,
         clearBoard,
         highlightWinner,
+        displayUpdater,
     }
 })();
 
-
-
-
-
 const playerFactory = (playerName, marker) => {
 
-    let winner = ['']
-
     function displayWinner (one, two, three) {
-        winner[0] = playerName;
-        console.log(`${winner[0]} WINS`)
-        var delayInMs = 3000;
-        gameboard.highlightWinner(one, two,three);
+        gameChecker.winner = playerName;
+        gameboard.displayUpdater(`${gameChecker.winner} wins`)
+        var delayInMs = 2000;
 
-        // setTimeout(function(){
-        //      location.reload()
-        // }, delayInMs)
+        setTimeout(function(){
+            gameboard.displayUpdater('play again?')
+            const display = document.querySelector('.display')
+            display.addEventListener('click', ()=> {
+                location.reload()
+            })
+
+
+        }, delayInMs)
+        gameboard.highlightWinner(one, two,three);
     }
 
 
@@ -72,8 +83,9 @@ const playerFactory = (playerName, marker) => {
         let count = 0;
 
         return () => {
-            if (winner[0]){
-                return 
+
+            if (gameChecker.winner[0]){
+                return;
             }
 
         else if (count === 0){
@@ -81,6 +93,7 @@ const playerFactory = (playerName, marker) => {
                     gameboard.gameArray[Number(gameboard.value[0])] = playerOne.marker //places marker 
                     gameboard.clearBoard()
                     gameboard.makeBoard()
+                    gameboard.displayUpdater(playerTwo.playerName + "'s turn")
                     gameChecker.winnerChecker()
                     count++;
             } else {return};
@@ -91,6 +104,7 @@ const playerFactory = (playerName, marker) => {
                     gameboard.gameArray[Number(gameboard.value[0])] = playerTwo.marker
                     gameboard.clearBoard()
                     gameboard.makeBoard()
+                    gameboard.displayUpdater(playerOne.playerName + "'s turn")
                     gameChecker.winnerChecker()
                     count--;
             } else {return};
@@ -105,8 +119,9 @@ const playerFactory = (playerName, marker) => {
     return {playerName, marker, turns, displayWinner} 
 };
 
-
 const gameChecker = (()=>{
+
+    let winner = ['']
 
 
     function winnerChecker () {
@@ -178,17 +193,24 @@ const gameChecker = (()=>{
             tieChecker()
         }
 
-
     }
+
 
     function tieChecker (){
         if (gameboard.gameArray.includes('')==false) {
             console.log('its a tie')
+            var delayInMs = 3000;
+    
+            setTimeout(function(){
+                 location.reload()
+            }, delayInMs)
+
         } else {return}
     }
   
     return {
         winnerChecker,   
+        winner,
     }
 
 
@@ -196,13 +218,25 @@ const gameChecker = (()=>{
 
 
 
+const form = document.querySelector('form')
+let playerOne;
+let playerTwo;
 
-gameboard.makeBoard()
+form.addEventListener("submit", (e)=> { 
+    e.preventDefault();
+    const input1 = document.getElementById("input1");
+    const input2 = document.getElementById("input2");
+    playerOne = playerFactory(input1.value, 'X');
+    playerTwo = playerFactory(input2.value, 'O')
+    form.remove();
+    gameboard.clearBoard()
+    gameboard.makeBoard()
+    gameboard.displayUpdater(playerOne.playerName + "'s turn")
+    
+},
+);
 
 
-
-const playerOne = playerFactory('Jeff', 'X');
-const playerTwo = playerFactory('Marco', 'O');
 
 
 
